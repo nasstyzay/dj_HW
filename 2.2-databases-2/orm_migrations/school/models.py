@@ -2,8 +2,8 @@ from django.db import models
 
 
 class Teacher(models.Model):
-    name = models.CharField(max_length=30, verbose_name='Имя')
-    subject = models.CharField(max_length=10, verbose_name='Предмет')
+    name = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100)
 
     class Meta:
         verbose_name = 'Учитель'
@@ -12,11 +12,10 @@ class Teacher(models.Model):
     def __str__(self):
         return self.name
 
-
 class Student(models.Model):
-    name = models.CharField(max_length=30, verbose_name='Имя')
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    group = models.CharField(max_length=10, verbose_name='Класс')
+    name = models.CharField(max_length=100)
+    teachers = models.ManyToManyField(Teacher, related_name='students')
+
 
     class Meta:
         verbose_name = 'Ученик'
