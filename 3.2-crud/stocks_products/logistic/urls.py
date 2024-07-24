@@ -1,9 +1,9 @@
-from rest_framework.routers import DefaultRouter
+from django.urls import path
+from .views import ProductListView, ProductDetailView, StockListView, StockDetailView
 
-from logistic.views import ProductViewSet, StockViewSet
-
-router = DefaultRouter()
-router.register('products', ProductViewSet)
-router.register('stocks', StockViewSet)
-
-urlpatterns = router.urls
+urlpatterns = [
+    path('products/', ProductListView.as_view(), name='product-list'),
+    path('products/<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
+    path('stocks/', StockListView.as_view(), name='stock-list'),
+    path('stocks/<int:pk>/', StockDetailView.as_view(), name='stock-detail'),
+]
