@@ -1,30 +1,22 @@
-from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models
-
-
-class AdvertisementStatusChoices(models.TextChoices):
-    """Статусы объявления."""
-
-    OPEN = "OPEN", "Открыто"
-    CLOSED = "CLOSED", "Закрыто"
+from django.core.exceptions import ValidationError
 
 
 class Advertisement(models.Model):
-    """Объявление."""
+    STATUS_CHOICES = [
+        ('OPEN', 'Open'),
+        ('CLOSED', 'Closed'),
+    ]
 
-    title = models.TextField()
-    description = models.TextField(default='')
-    status = models.TextField(
-        choices=AdvertisementStatusChoices.choices,
-        default=AdvertisementStatusChoices.OPEN
-    )
-    creator = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-    updated_at = models.DateTimeField(
-        auto_now=True
-    )
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    status = models.CharField(max_length=6, choices=STATUS_CHOICES, default='OPEN')
+    author = models.ForeignKey(User, related_name='advertisements', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if self.status == 'OPEN' and Advertisement.objects.filter(author=self.author, status='OPEN').count() >= 10:
+            raise ValidationError('You cannot have more than 10 open advertisements.')
+        super().save(*args, **kwargs)
